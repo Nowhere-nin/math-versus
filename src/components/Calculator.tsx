@@ -47,7 +47,6 @@ export default function Calculator ({ team, onSubmit }: Props) {
                 <button className="clear-btn" onClick={handleClear}>C</button>
                 <button onClick={() => handleNumberClick("0")}>0</button>
                 <button className="submit-btn" onClick={handleSubmit}>=</button>
-                {/* <button onClick={() => handleNumberClick("-")}>-</button> */}
             </div>
 
 

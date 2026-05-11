@@ -185,11 +185,11 @@
 
 .app-container {
   /* min-height: 100vh; */
-  background-color: #f9fafb;
+  /* background-color: #f9fafb; */
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px;
+  /* padding: 40px; */
 }
 
 .calculators-container {
@@ -207,12 +207,13 @@
 
 .screen-card {
   min-height: 100vh;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 20px;
-  background-color: #f9fafb;
+  /* background-color: #f9fafb; */
 }
 
 .screen-card h1 {
