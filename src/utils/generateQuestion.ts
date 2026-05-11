@@ -2,9 +2,6 @@ import type { Question, Operator, GradeLevel } from "../types/game";
 const getRandom = (min: number, max: number) => 
     Math.floor(Math.random() * (max - min + 1)) + min;
 
-const getRandom10 = (min: number, max: number) => 
-    Math.floor(Math.random() * (max - min +1)) + min;
-
 export function generateQuestion(gradeLevel: GradeLevel): Question {
     // Definimos valores iniciales seguros (mínimo 1 para evitar el cero)
     let num1 = getRandom(1, 10); 
