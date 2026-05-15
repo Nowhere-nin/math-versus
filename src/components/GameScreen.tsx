@@ -18,12 +18,13 @@ interface Props {
     useTimer: boolean;
     time: number;
     handleExit: () => void;
+    shift: boolean;
 }
 
-export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit}: Props) => {
+export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit, shift}: Props) => {
 
     // Definimos el estado para la data de la animación
-    const [currentAnimData, setCurrentAnimData] = useState<any>(tugOfWarAnimation); // Usar este para crear la build
+    const [currentAnimData, setCurrentAnimData] = useState<object>(tugOfWarAnimation); // Usar este para crear la build
     // const [currentAnimData, setCurrentAnimData] = useState(tugOfWarAnimation); // Usar este para probar con yarn dev
 
     const options = {
@@ -32,6 +33,9 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     }
     
     const { View } = useLottie(options);
+
+    const [redShift, setRedShift] = useState(true);
+    const [blueShift, setBlueShift] = useState(true);
     
     const [question, setQuestion] = useState<Question>(generateQuestion(gradeLevel));
     const [message, setMessage] = useState("");
@@ -42,9 +46,21 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     const handleSkip = () => {
       setQuestion(generateQuestion(gradeLevel));
       
-      setTimeLeft(time);
+      if(!shift) {
+        setTimeLeft(time);
+      }
   
       setMessage("Se saltó la pregunta");
+    }
+
+    const handleShift = (actualTeam: string) => {
+      if(actualTeam === "A") {
+        setBlueShift(!blueShift)
+        setRedShift(true)
+      } else if(actualTeam === "B") {
+        setRedShift(!redShift)
+        setBlueShift(true)
+      }
     }
 
     useEffect( () => {
@@ -54,6 +70,13 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
         setTimeLeft( (prev) => {
           if (prev <= 1) {
             handleSkip();
+            if(shift) {
+              if (blueShift) {
+                handleShift("A")
+              } else if (redShift) {
+                handleShift("B")
+              }
+            }
             return time;
           }
           return prev -1
@@ -75,12 +98,16 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     setProgress(limitedProgress);
     setMessage(`¡Equipo ${team}: respuesta correcta!`);
 
+    if(shift){
+      handleShift(team)
+    }
+
     // GANA EQUIPO B (Rojo)
     if (limitedProgress === 0) {
       setMessage("¡El equipo B ganó la partida!");
       setCurrentAnimData(redWin); // Cambia la animación en el View
       
-      // Esperamos 3 segundos antes de ir a la pantalla de ganador final
+      // Esperamos 5 segundos antes de ir a la pantalla de ganador final
       setTimeout(() => {
         handleWinner("B");
       }, 5000);
@@ -126,9 +153,9 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
       <ScoreBar progress={progress} />
 
       <div className='calculators-container'>
-        <Calculator team='A' onSubmit={handleAnswer} />
+        <Calculator team='A' onSubmit={handleAnswer} disabled={!blueShift}/>
         { View }
-        <Calculator team='B' onSubmit={handleAnswer} />
+        <Calculator team='B' onSubmit={handleAnswer} disabled={!redShift}/>
       </div>
 
       <p className='message-text'>{message}</p>

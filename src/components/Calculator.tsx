@@ -5,9 +5,10 @@ import '../Calculator.css'
 interface Props {
     team: Team;
     onSubmit: (team: Team, value: number) => void;
+    disabled: boolean;
 }
 
-export default function Calculator ({ team, onSubmit }: Props) {
+export default function Calculator ({ team, onSubmit, disabled }: Props) {
     const [value, setValue] = useState("");
 
     const handleNumberClick = (num: string) => {
@@ -26,7 +27,7 @@ export default function Calculator ({ team, onSubmit }: Props) {
     };
 
     return (
-        <div className={`calculator calculator-team-${team.toLowerCase()}`} >
+        <div className={`calculator calculator-team-${team.toLowerCase()} ${disabled ? "divDisabled" : ""}`}>
             <h3 className="calculator-title" >Equipo {team}</h3>
 
             <input className="calculator-display" type="text" value={value} readOnly disabled/>

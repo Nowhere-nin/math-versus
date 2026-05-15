@@ -9,6 +9,8 @@ interface Props {
 
     onStart: () => void;
     onTimeChange: (value: number) => void;
+    shift: boolean;
+    onShiftChange: (value:boolean) => void;
 }
 
 export default function StartScreen({
@@ -18,6 +20,8 @@ export default function StartScreen({
     onTimerChange,
     onStart,
     onTimeChange,
+    shift,
+    onShiftChange,
 }: Props ) {
     return (
         <div className="screen-card">
@@ -44,17 +48,23 @@ export default function StartScreen({
                 <div className="checkbox-wrapper-2">
                     <input type="checkbox" id="timer-toggle" checked={useTimer} className="sc-gJwTLC ikxBAC" onChange={ (e) => onTimerChange(e.target.checked) }/>
                 </div>
-                <label htmlFor="timer-toggle">¿Activar tiempo limitado? (mínimo 15s)</label>
+                <label htmlFor="timer-toggle">¿Activar tiempo limitado? (mínimo 10s - máximo 60s)</label>
             </div>
             <input
                 type="number"
-                min="15"
+                min="10"
                 max="60"
                 id="time-duration"
                 placeholder="15"
                 onChange={ (e) => onTimeChange( parseInt(e.target.value) ) }
                 disabled={!useTimer}
             />
+            <div>
+                <div className="checkbox-wrapper-2">
+                    <input type="checkbox" id="timer-toggle" checked={shift} className="sc-gJwTLC ikxBAC" onChange={ (e) => onShiftChange(e.target.checked) }/>
+                </div>
+                <label htmlFor="timer-toggle">¿Por turnos?</label>
+            </div>
 
             <button onClick={onStart}>Comenzar partida</button>
         </div>

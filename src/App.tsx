@@ -24,7 +24,8 @@ function App() {
     setScreen("start")
   }
 
-  const [time, setTime] = useState(15);
+  const [time, setTime] = useState(10);
+  const [shift, setShift] = useState(false);
 
   if (screen === "start") {
     return (
@@ -38,6 +39,8 @@ function App() {
           setScreen("game");
         }}
         onTimeChange={setTime}
+        shift={shift}
+        onShiftChange={setShift}
       />
     );
   }
@@ -61,6 +64,7 @@ function App() {
         handleWinner={handleWinner}
         useTimer={useTimer}
         time={time}
+        shift={shift}
         handleExit={handleExit}
       />
     )

@@ -349,3 +349,8 @@ body {
   background-size: cover;
   background-attachment: fixed;
 }
+
+.divDisabled {
+   pointer-events: none;
+   opacity: 0.6;
+}
