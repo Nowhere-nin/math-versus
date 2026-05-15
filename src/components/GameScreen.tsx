@@ -16,9 +16,11 @@ interface Props {
     gradeLevel: GradeLevel;
     handleWinner: (winner: Team) => void;
     useTimer: boolean;
+    time: number;
+    handleExit: () => void;
 }
 
-export const GameScreen = ({gradeLevel, handleWinner, useTimer}: Props) => {
+export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit}: Props) => {
 
     // Definimos el estado para la data de la animación
     const [currentAnimData, setCurrentAnimData] = useState<any>(tugOfWarAnimation); // Usar este para crear la build
@@ -28,14 +30,22 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer}: Props) => {
       animationData: currentAnimData,
       loop: currentAnimData === tugOfWarAnimation
     }
-
+    
     const { View } = useLottie(options);
     
     const [question, setQuestion] = useState<Question>(generateQuestion(gradeLevel));
     const [message, setMessage] = useState("");
     const [progress, setProgress] = useState(50);
-
-    const [timeLeft, setTimeLeft] = useState(15);
+    
+    const [timeLeft, setTimeLeft] = useState(time);
+    
+    const handleSkip = () => {
+      setQuestion(generateQuestion(gradeLevel));
+      
+      setTimeLeft(time);
+  
+      setMessage("Se saltó la pregunta");
+    }
 
     useEffect( () => {
       if (!useTimer) return;
@@ -44,7 +54,7 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer}: Props) => {
         setTimeLeft( (prev) => {
           if (prev <= 1) {
             handleSkip();
-            return 15;
+            return time;
           }
           return prev -1
         })
@@ -88,22 +98,18 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer}: Props) => {
       return;
     }
 
-    setTimeLeft(15);
+    setTimeLeft(time);
     setQuestion(generateQuestion(gradeLevel));
   };
 
-  const handleSkip = () => {
-    setQuestion(generateQuestion(gradeLevel));
-    
-    setTimeLeft(15);
-
-    setMessage("Se saltó la pregunta");
-  }
 
 
 
   return (
     <div className='app-container'>
+      <div className='exit-button'>
+        <button onClick={handleExit}>Salir</button>
+      </div>
       {/* <h1>Math Battle</h1> */}
 
       { useTimer && (

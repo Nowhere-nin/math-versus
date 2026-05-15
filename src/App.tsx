@@ -19,6 +19,12 @@ function App() {
     setWinner(winner);
     setScreen("winner");
   }
+  
+  const handleExit = () => {
+    setScreen("start")
+  }
+
+  const [time, setTime] = useState(15);
 
   if (screen === "start") {
     return (
@@ -31,6 +37,7 @@ function App() {
           setWinner(null);
           setScreen("game");
         }}
+        onTimeChange={setTime}
       />
     );
   }
@@ -53,6 +60,8 @@ function App() {
         gradeLevel={gradeLevel}
         handleWinner={handleWinner}
         useTimer={useTimer}
+        time={time}
+        handleExit={handleExit}
       />
     )
   }

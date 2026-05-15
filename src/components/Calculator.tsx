@@ -29,7 +29,7 @@ export default function Calculator ({ team, onSubmit }: Props) {
         <div className={`calculator calculator-team-${team.toLowerCase()}`} >
             <h3 className="calculator-title" >Equipo {team}</h3>
 
-            <input className="calculator-display" type="text" value={value} readOnly/>
+            <input className="calculator-display" type="text" value={value} readOnly disabled/>
 
             <div className="calculator-buttons" >
                 <button onClick={() => handleNumberClick("1")}>1</button>

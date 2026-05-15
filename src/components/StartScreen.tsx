@@ -8,6 +8,7 @@ interface Props {
     onTimerChange: (value: boolean) => void;
 
     onStart: () => void;
+    onTimeChange: (value: number) => void;
 }
 
 export default function StartScreen({
@@ -16,10 +17,11 @@ export default function StartScreen({
     useTimer,
     onTimerChange,
     onStart,
+    onTimeChange,
 }: Props ) {
     return (
         <div className="screen-card">
-            <h1>Math Battle</h1>
+            <h1>Matemáticas</h1>
             <p>Selecciona el curso para comenzar</p>
 
             <select
@@ -39,14 +41,20 @@ export default function StartScreen({
             </select>
 
             <div>
-                <input
-                    type="checkbox"
-                    id="timer-toggle"
-                    checked={useTimer}
-                    onChange={ (e) => onTimerChange(e.target.checked) }
-                />
-                <label htmlFor="timer-toggle">¿Activar tiempo limitado? (15s)</label>
+                <div className="checkbox-wrapper-2">
+                    <input type="checkbox" id="timer-toggle" checked={useTimer} className="sc-gJwTLC ikxBAC" onChange={ (e) => onTimerChange(e.target.checked) }/>
+                </div>
+                <label htmlFor="timer-toggle">¿Activar tiempo limitado? (mínimo 15s)</label>
             </div>
+            <input
+                type="number"
+                min="15"
+                max="60"
+                id="time-duration"
+                placeholder="15"
+                onChange={ (e) => onTimeChange( parseInt(e.target.value) ) }
+                disabled={!useTimer}
+            />
 
             <button onClick={onStart}>Comenzar partida</button>
         </div>

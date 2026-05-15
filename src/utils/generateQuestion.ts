@@ -66,9 +66,7 @@ export function generateQuestion(gradeLevel: GradeLevel): Question {
         operator = "*";
     }
 
-    // ... puedes seguir con el resto de niveles
-
-    // 2. CONTROL DE NEGATIVOS (El "Seguro de Vida")
+    // 2. CONTROL DE NEGATIVOS
     // Si es una resta y el resultado daría negativo, los intercambiamos.
     if (operator === "-" && num1 < num2) {
         const temp = num1;
