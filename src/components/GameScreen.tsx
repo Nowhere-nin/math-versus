@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
-import Calculator from "./Calculator"
-import QuestionDisplay from "./QuestionDisplay"
-import { ScoreBar } from "./ScoreBar"
+import Calculator from "./Calculator";
+import QuestionDisplay from "./QuestionDisplay";
+import { ScoreBar } from "./ScoreBar";
 import type { GradeLevel, Question, Team } from "../types/game";
 import { generateQuestion } from "../utils/generateQuestion";
 
 import { useLottie }  from "lottie-react";
-// import tugOfWarAnimation from "../assets/tug.json";
 import tugOfWarAnimation from "../assets/TugOfwarAnim.json";
 
-import redWin from "../assets/RedWin.json";   // Para cuando gana el Equipo B (Rojo)
-import blueWin from "../assets/BlueWin.json"; // Para cuando gana el Equipo A (Azul)
+import redWin from "../assets/RedWin.json";
+import blueWin from "../assets/BlueWin.json";
 
 interface Props {
     gradeLevel: GradeLevel;
@@ -23,9 +22,7 @@ interface Props {
 
 export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit, shift}: Props) => {
 
-    // Definimos el estado para la data de la animación
-    const [currentAnimData, setCurrentAnimData] = useState<object>(tugOfWarAnimation); // Usar este para crear la build
-    // const [currentAnimData, setCurrentAnimData] = useState(tugOfWarAnimation); // Usar este para probar con yarn dev
+    const [currentAnimData, setCurrentAnimData] = useState<object>(tugOfWarAnimation);
 
     const options = {
       animationData: currentAnimData,
@@ -105,9 +102,8 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     // GANA EQUIPO B (Rojo)
     if (limitedProgress === 0) {
       setMessage("¡El equipo B ganó la partida!");
-      setCurrentAnimData(redWin); // Cambia la animación en el View
+      setCurrentAnimData(redWin);
       
-      // Esperamos 5 segundos antes de ir a la pantalla de ganador final
       setTimeout(() => {
         handleWinner("B");
       }, 5000);
@@ -117,7 +113,7 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     // GANA EQUIPO A (Azul)
     if (limitedProgress === 100) {
       setMessage("¡El equipo A ganó la partida!");
-      setCurrentAnimData(blueWin); // Cambia la animación en el View
+      setCurrentAnimData(blueWin);
       
       setTimeout(() => {
         handleWinner("A");
@@ -129,15 +125,11 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     setQuestion(generateQuestion(gradeLevel));
   };
 
-
-
-
   return (
     <div className='app-container'>
       <div className='exit-button'>
         <button onClick={handleExit}>Salir</button>
       </div>
-      {/* <h1>Math Battle</h1> */}
 
       { useTimer && (
         <div style={{fontSize: '1.5rem', fontWeight:'bold',

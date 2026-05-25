@@ -1,5 +1,5 @@
-import './App.css'
-import './components/ScoreBar.css'
+import './App.css';
+import './components/ScoreBar.css';
 import type { GradeLevel, Team } from './types/game';
 import { useState } from 'react';
 import WinnerScreen from './components/WinnerScreen';

@@ -72,7 +72,6 @@ export function generateQuestion(gradeLevel: GradeLevel): Question {
         const temp = num1;
         num1 = num2;
         num2 = temp;
-        // O en JS moderno: [num1, num2] = [num2, num1];
     }
 
     // 3. CÁLCULO DE LA RESPUESTA FINAL
