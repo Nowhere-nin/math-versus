@@ -157,9 +157,9 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
       <ScoreBar progress={progress} />
 
       <div className='calculators-container'>
-        <Calculator team='A' onSubmit={handleAnswer} disabled={!blueShift}/>
+        { !useWebControllers ? <Calculator team='A' onSubmit={handleAnswer} disabled={!blueShift}/> : "" }
         { View }
-        <Calculator team='B' onSubmit={handleAnswer} disabled={!redShift}/>
+        { !useWebControllers ? <Calculator team='B' onSubmit={handleAnswer} disabled={!redShift}/> : "" }
       </div>
 
       <p className='message-text'>{message}</p>
