@@ -24,8 +24,10 @@ function App() {
     setScreen("start")
   }
 
-  const [time, setTime] = useState(10);
+  const [time, setTime] = useState(5);
   const [shift, setShift] = useState(false);
+
+  const [useWebControllers, setUseWebControllers] = useState(false);
 
   if (screen === "start") {
     return (
@@ -41,6 +43,8 @@ function App() {
         onTimeChange={setTime}
         shift={shift}
         onShiftChange={setShift}
+        useWebControllers={useWebControllers}
+        setWebControllers={setUseWebControllers}
       />
     );
   }
@@ -66,6 +70,7 @@ function App() {
         time={time}
         shift={shift}
         handleExit={handleExit}
+        useWebControllers={useWebControllers}
       />
     )
   }

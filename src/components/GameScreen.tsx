@@ -11,6 +11,8 @@ import tugOfWarAnimation from "../assets/TugOfwarAnim.json";
 import redWin from "../assets/RedWin.json";
 import blueWin from "../assets/BlueWin.json";
 
+import { useFirebaseGame } from "../hooks/useFirebaseGame";
+
 interface Props {
     gradeLevel: GradeLevel;
     handleWinner: (winner: Team) => void;
@@ -18,9 +20,10 @@ interface Props {
     time: number;
     handleExit: () => void;
     shift: boolean;
+    useWebControllers: boolean;
 }
 
-export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit, shift}: Props) => {
+export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit, shift, useWebControllers}: Props) => {
 
     const [currentAnimData, setCurrentAnimData] = useState<object>(tugOfWarAnimation);
 
@@ -125,11 +128,20 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     setQuestion(generateQuestion(gradeLevel));
   };
 
+  const { roomCode } = useFirebaseGame(useWebControllers, handleAnswer);
+
   return (
     <div className='app-container'>
       <div className='exit-button'>
         <button onClick={handleExit}>Salir</button>
       </div>
+
+      {useWebControllers && roomCode && (
+                <div className="room-code-display" style={{ textAlign: "center", marginBottom: "20px" }}>
+                    <h2>Código de la sala: {roomCode}</h2>
+                    <p>Ingresa este código en tu dispositivo para jugar</p>
+                </div>
+            )}
 
       { useTimer && (
         <div style={{fontSize: '1.5rem', fontWeight:'bold',

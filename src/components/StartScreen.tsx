@@ -11,6 +11,9 @@ interface Props {
     onTimeChange: (value: number) => void;
     shift: boolean;
     onShiftChange: (value:boolean) => void;
+
+    useWebControllers: boolean;
+    setWebControllers: (value:boolean) => void;
 }
 
 export default function StartScreen({
@@ -22,6 +25,8 @@ export default function StartScreen({
     onTimeChange,
     shift,
     onShiftChange,
+    useWebControllers,
+    setWebControllers,
 }: Props ) {
     return (
         <div className="screen-card">
@@ -48,15 +53,15 @@ export default function StartScreen({
                 <div className="checkbox-wrapper-2">
                     <input type="checkbox" id="timer-toggle" checked={useTimer} className="sc-gJwTLC ikxBAC" onChange={ (e) => onTimerChange(e.target.checked) }/>
                 </div>
-                <label htmlFor="timer-toggle">¿Activar tiempo limitado? (mínimo 10s - máximo 60s)</label>
+                <label htmlFor="timer-toggle">¿Activar tiempo limitado? (mínimo 5s - máximo 60s)</label>
             </div>
             <input
                 type="number"
-                min="10"
+                min="5"
                 max="60"
                 id="time-duration"
-                placeholder="15"
-                onChange={ (e) => onTimeChange( parseInt(e.target.value) ) }
+                placeholder="5"
+                onChange={ (e) => onTimeChange( parseInt(e.target.value) < 5 ? 5 : parseInt(e.target.value) ) }
                 disabled={!useTimer}
             />
             <div>
@@ -64,6 +69,13 @@ export default function StartScreen({
                     <input type="checkbox" id="timer-toggle" checked={shift} className="sc-gJwTLC ikxBAC" onChange={ (e) => onShiftChange(e.target.checked) }/>
                 </div>
                 <label htmlFor="timer-toggle">¿Por turnos?</label>
+            </div>
+
+            <div>
+                <div className="checkbox-wrapper-2">
+                    <input type="checkbox" id="timer-toggle" checked={useWebControllers} className="sc-gJwTLC ikxBAC" onChange={ (e) => setWebControllers(e.target.checked) }/>
+                </div>
+                <label htmlFor="timer-toggle">¿Usar dispositivos externos?</label>
             </div>
 
             <button onClick={onStart}>Comenzar partida</button>
