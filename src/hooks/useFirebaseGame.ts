@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { ref, set, onValue, remove, onDisconnect } from 'firebase/database';
+import { ref, set, onValue, remove, onDisconnect, update } from 'firebase/database';
 import { database } from '../services/firebaseConfig';
 import type { Team } from '../types/game';
 
@@ -27,6 +27,7 @@ export function useFirebaseGame(
 
         set(roomRef, {
             status: "waiting",
+            winner: null,
             lastAnswer: null
         });
 
@@ -46,5 +47,15 @@ export function useFirebaseGame(
         };
     }, [isActive, roomCode]);
 
-    return { roomCode };
+    const setGameFinished = (winner: Team) => {
+        if(!roomCode) return;
+
+        const roomRef = ref(database, `rooms/${roomCode}`);
+        update(roomRef, {
+            status: "finished",
+            winner: winner
+        })
+    }
+
+    return { roomCode, setGameFinished };
 }

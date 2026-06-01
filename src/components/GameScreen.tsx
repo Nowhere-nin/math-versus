@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Calculator from "./Calculator";
 import QuestionDisplay from "./QuestionDisplay";
 import { ScoreBar } from "./ScoreBar";
@@ -6,7 +6,7 @@ import type { GradeLevel, Question, Team } from "../types/game";
 import { generateQuestion } from "../utils/generateQuestion";
 
 import { useLottie }  from "lottie-react";
-import tugOfWarAnimation from "../assets/TugOfwarAnim.json";
+import tugOfWarAnimation from "../assets/TugOfwarAnimRemix.json";
 
 import redWin from "../assets/RedWin.json";
 import blueWin from "../assets/BlueWin.json";
@@ -42,6 +42,8 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     const [progress, setProgress] = useState(50);
     
     const [timeLeft, setTimeLeft] = useState(time);
+
+    const setGameFinishedRef = useRef<((winner: Team) => void)>(null);
     
     const handleSkip = () => {
       setQuestion(generateQuestion(gradeLevel));
@@ -106,6 +108,10 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     if (limitedProgress === 0) {
       setMessage("¡El equipo B ganó la partida!");
       setCurrentAnimData(redWin);
+
+      if(useWebControllers && setGameFinishedRef.current) {
+        setGameFinishedRef.current("B")
+      }
       
       setTimeout(() => {
         handleWinner("B");
@@ -117,6 +123,10 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     if (limitedProgress === 100) {
       setMessage("¡El equipo A ganó la partida!");
       setCurrentAnimData(blueWin);
+
+      if(useWebControllers && setGameFinishedRef.current) {
+        setGameFinishedRef.current("A")
+      }
       
       setTimeout(() => {
         handleWinner("A");
@@ -128,7 +138,11 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
     setQuestion(generateQuestion(gradeLevel));
   };
 
-  const { roomCode } = useFirebaseGame(useWebControllers, handleAnswer);
+  const { roomCode, setGameFinished } = useFirebaseGame(useWebControllers, handleAnswer);
+
+  useEffect( () => {
+    setGameFinishedRef.current = setGameFinished;
+  },[setGameFinished]);
 
   return (
     <div className='app-container'>

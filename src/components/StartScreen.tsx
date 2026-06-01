@@ -66,16 +66,16 @@ export default function StartScreen({
             />
             <div>
                 <div className="checkbox-wrapper-2">
-                    <input type="checkbox" id="timer-toggle" checked={shift} className="sc-gJwTLC ikxBAC" onChange={ (e) => onShiftChange(e.target.checked) }/>
+                    <input type="checkbox" id="shift-toggle" checked={shift} className="sc-gJwTLC ikxBAC" onChange={ (e) => onShiftChange(e.target.checked) }/>
                 </div>
-                <label htmlFor="timer-toggle">¿Por turnos?</label>
+                <label htmlFor="shift-toggle">¿Por turnos?</label>
             </div>
 
             <div>
                 <div className="checkbox-wrapper-2">
-                    <input type="checkbox" id="timer-toggle" checked={useWebControllers} className="sc-gJwTLC ikxBAC" onChange={ (e) => setWebControllers(e.target.checked) }/>
+                    <input type="checkbox" id="web-toggle" checked={useWebControllers} className="sc-gJwTLC ikxBAC" onChange={ (e) => setWebControllers(e.target.checked) }/>
                 </div>
-                <label htmlFor="timer-toggle">¿Usar dispositivos externos?</label>
+                <label htmlFor="web-toggle">¿Usar dispositivos externos?</label>
             </div>
 
             <button onClick={onStart}>Comenzar partida</button>
