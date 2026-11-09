@@ -27,9 +27,24 @@ export function generateQuestion(gradeLevel: GradeLevel): Question {
         operator = Math.random() > 0.5 ? "+" : "-";
     }
     else if (gradeLevel === "4-basic") {
-        num1 = getRandom(2, 10); // Evitamos el 1 para tablas más reales
-        num2 = getRandom(2, 10);
-        operator = "*";
+        // num1 = getRandom(2, 10); // Evitamos el 1 para tablas más reales
+        // num2 = getRandom(2, 10);
+
+        // Tablas del 2 al 6
+        const a = getRandom(2, 6);
+        const b = getRandom(2, 10);
+        
+        // 50% de probabilidad para multiplicación o división
+        operator = Math.random() > 0.5 ? "*" : "/";
+
+        if (operator === "*") {
+            num1 = a;
+            num2 = b;
+        } else {
+            // Para división exacta: (a * b) / a = b
+            num1 = a * b; // El total es el dividendo
+            num2 = a;     // El divisor es uno de los factores
+        }
     }
     else if (gradeLevel === "5-basic") {
 
@@ -51,9 +66,22 @@ export function generateQuestion(gradeLevel: GradeLevel): Question {
         operator = "*";
     }
     else if (gradeLevel === "6-basic") {
-        num1 = getRandom(2, 10); // Evitamos el 1 para tablas más reales
-        num2 = getRandom(2, 10);
-        operator = "*";
+
+        // Tablas del 6 al 9
+        const a = getRandom(6, 9);
+        const b = getRandom(2, 10);
+        
+        // 50% de probabilidad para multiplicación o división
+        operator = Math.random() > 0.5 ? "*" : "/";
+
+        if (operator === "*") {
+            num1 = a;
+            num2 = b;
+        } else {
+            // Para división exacta: (a * b) / a = b
+            num1 = a * b; // El total es el dividendo
+            num2 = a;     // El divisor es uno de los factores
+        }
     }
     else if (gradeLevel === "7-basic") {
         num1 = getRandom(2, 10); // Evitamos el 1 para tablas más reales
@@ -79,6 +107,7 @@ export function generateQuestion(gradeLevel: GradeLevel): Question {
     if (operator === "+") answer = num1 + num2;
     if (operator === "-") answer = num1 - num2;
     if (operator === "*") answer = num1 * num2;
+    if (operator === "/") answer = num1 / num2;
 
     return { num1, num2, operator, answer };
 }
