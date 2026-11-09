@@ -11,6 +11,8 @@ function App() {
 
   const [screen, setScreen] = useState<"start" | "game" | "winner">("start");
   const [gradeLevel, setGradeLevel] = useState<GradeLevel>("1-basic");
+  const [gradeLevelB, setGradeLevelB] = useState<GradeLevel>("1-basic");
+  const [duelMode, setDuelMode] = useState(false);
   const [winner, setWinner] = useState<Team | null>(null);
 
   const [useTimer, setUseTimer] = useState(false);
@@ -19,7 +21,7 @@ function App() {
     setWinner(winner);
     setScreen("winner");
   }
-  
+
   const handleExit = () => {
     setScreen("start")
   }
@@ -34,7 +36,11 @@ function App() {
       <StartScreen
         gradeLevel={gradeLevel}
         onGradeLevelChange={setGradeLevel}
-        useTimer= {useTimer}
+        gradeLevelB={gradeLevelB}
+        onGradeLevelBChange={setGradeLevelB}
+        duelMode={duelMode}
+        onDuelModeChange={setDuelMode}
+        useTimer={useTimer}
         onTimerChange={setUseTimer}
         onStart={() => {
           setWinner(null);
@@ -64,16 +70,20 @@ function App() {
   if (screen === "game") {
     return (
       <GameScreen
-        gradeLevel={gradeLevel}
+        gradeLevelA={gradeLevel}
+        gradeLevelB={duelMode ? gradeLevelB : gradeLevel}
+        duelMode={duelMode}
         handleWinner={handleWinner}
         useTimer={useTimer}
         time={time}
-        shift={shift}
+        shift={shift && !duelMode}
         handleExit={handleExit}
         useWebControllers={useWebControllers}
       />
     )
   }
+
+  return null;
 }
 
 export default App

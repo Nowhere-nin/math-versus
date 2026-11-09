@@ -13,8 +13,12 @@ import blueWin from "../assets/BlueWin.json";
 
 import { useFirebaseGame } from "../hooks/useFirebaseGame";
 
+import "../Duel.css";
+
 interface Props {
-    gradeLevel: GradeLevel;
+    gradeLevelA: GradeLevel;
+    gradeLevelB: GradeLevel;
+    duelMode: boolean;
     handleWinner: (winner: Team) => void;
     useTimer: boolean;
     time: number;
@@ -23,7 +27,17 @@ interface Props {
     useWebControllers: boolean;
 }
 
-export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit, shift, useWebControllers}: Props) => {
+export const GameScreen = ({
+  gradeLevelA,
+  gradeLevelB,
+  duelMode,
+  handleWinner,
+  useTimer,
+  time,
+  handleExit,
+  shift,
+  useWebControllers
+}: Props) => {
 
     const [currentAnimData, setCurrentAnimData] = useState<object>(tugOfWarAnimation);
 
@@ -31,29 +45,50 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
       animationData: currentAnimData,
       loop: currentAnimData === tugOfWarAnimation
     }
-    
+
     const { View } = useLottie(options);
 
     const [redShift, setRedShift] = useState(true);
     const [blueShift, setBlueShift] = useState(true);
-    
-    const [question, setQuestion] = useState<Question>(generateQuestion(gradeLevel));
+
+    // Preguntas iniciales (en modo normal ambos equipos comparten la misma)
+    const [initial] = useState(() => {
+      const a = generateQuestion(gradeLevelA);
+      return { a, b: duelMode ? generateQuestion(gradeLevelB) : a };
+    });
+    const [questionA, setQuestionA] = useState<Question>(initial.a);
+    const [questionB, setQuestionB] = useState<Question>(initial.b);
+
     const [message, setMessage] = useState("");
     const [progress, setProgress] = useState(50);
-    
-    const [timeLeft, setTimeLeft] = useState(time);
+    const [gameOver, setGameOver] = useState(false);
+
+    const [timeLeftA, setTimeLeftA] = useState(time);
+    const [timeLeftB, setTimeLeftB] = useState(time);
 
     const setGameFinishedRef = useRef<((winner: Team) => void)>(null);
-    
-    const handleSkip = () => {
-      setQuestion(generateQuestion(gradeLevel));
-      
-      if(!shift) {
-        setTimeLeft(time);
+
+    // Renueva la pregunta de un equipo (o de ambos si no es duelo) y reinicia su tiempo
+    const refreshQuestion = (team: Team) => {
+      if (!duelMode) {
+        const q = generateQuestion(gradeLevelA);
+        setQuestionA(q);
+        setQuestionB(q);
+        setTimeLeftA(time);
+      } else if (team === "A") {
+        setQuestionA(generateQuestion(gradeLevelA));
+        setTimeLeftA(time);
+      } else {
+        setQuestionB(generateQuestion(gradeLevelB));
+        setTimeLeftB(time);
       }
-  
-      setMessage("Se saltó la pregunta");
-    }
+    };
+
+    const handleSkip = (team: Team) => {
+      if (gameOver) return;
+      refreshQuestion(team);
+      setMessage(duelMode ? `Equipo ${team} saltó su pregunta` : "Se saltó la pregunta");
+    };
 
     const handleShift = (actualTeam: string) => {
       if(actualTeam === "A") {
@@ -65,30 +100,42 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
       }
     }
 
-    useEffect( () => {
-      if (!useTimer) return;
+    // El reloj baja cada segundo...
+    useEffect(() => {
+      if (!useTimer || gameOver) return;
 
-      const interval = setInterval( () => {
-        setTimeLeft( (prev) => {
-          if (prev <= 1) {
-            handleSkip();
-            if(shift) {
-              if (blueShift) {
-                handleShift("A")
-              } else if (redShift) {
-                handleShift("B")
-              }
-            }
-            return time;
-          }
-          return prev -1
-        })
+      const interval = setInterval(() => {
+        setTimeLeftA((p) => p - 1);
+        if (duelMode) setTimeLeftB((p) => p - 1);
       }, 1000);
 
       return () => clearInterval(interval);
-    }, [question, useTimer])
+    }, [useTimer, duelMode, gameOver]);
+
+    // ...y cuando llega a 0 se salta la pregunta de ese equipo
+    useEffect(() => {
+      if (!useTimer || gameOver || timeLeftA > 0) return;
+
+      handleSkip("A");
+      if (shift) {
+        if (blueShift) handleShift("A");
+        else if (redShift) handleShift("B");
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [timeLeftA]);
+
+    useEffect(() => {
+      if (!useTimer || !duelMode || gameOver || timeLeftB > 0) return;
+
+      handleSkip("B");
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [timeLeftB]);
 
   const handleAnswer = (team: Team, value: number) => {
+    if (gameOver) return;
+
+    const question = team === "A" ? questionA : questionB;
+
     if (value !== question.answer) {
       setMessage(`¡Equipo ${team}: respuesta incorrecta!`);
       return;
@@ -106,13 +153,14 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
 
     // GANA EQUIPO B (Rojo)
     if (limitedProgress === 0) {
+      setGameOver(true);
       setMessage("¡El equipo B ganó la partida!");
       setCurrentAnimData(redWin);
 
       if(useWebControllers && setGameFinishedRef.current) {
         setGameFinishedRef.current("B")
       }
-      
+
       setTimeout(() => {
         handleWinner("B");
       }, 5000);
@@ -121,21 +169,21 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
 
     // GANA EQUIPO A (Azul)
     if (limitedProgress === 100) {
+      setGameOver(true);
       setMessage("¡El equipo A ganó la partida!");
       setCurrentAnimData(blueWin);
 
       if(useWebControllers && setGameFinishedRef.current) {
         setGameFinishedRef.current("A")
       }
-      
+
       setTimeout(() => {
         handleWinner("A");
       }, 5000);
       return;
     }
 
-    setTimeLeft(time);
-    setQuestion(generateQuestion(gradeLevel));
+    refreshQuestion(team);
   };
 
   const { roomCode, setGameFinished } = useFirebaseGame(useWebControllers, handleAnswer);
@@ -151,22 +199,39 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
       </div>
 
       {useWebControllers && roomCode && (
-                <div className="room-code-display" style={{ textAlign: "center", marginBottom: "20px" }}>
-                    <h2>Código de la sala: {roomCode}</h2>
-                    <p>Ingresa este código en tu dispositivo para jugar</p>
-                </div>
-            )}
-
-      { useTimer && (
-        <div style={{fontSize: '1.5rem', fontWeight:'bold',
-          color: timeLeft < 5 ? 'red' : 'black',
-          marginBottom: '10px'
-        }}>
-          Tiempo: {timeLeft} segundos
+        <div className="room-code-display" style={{ textAlign: "center", marginBottom: "20px" }}>
+          <h2>Código de la sala: {roomCode}</h2>
+          <p>Ingresa este código en tu dispositivo para jugar</p>
         </div>
       )}
 
-      <QuestionDisplay question={question} />
+      { useTimer && (
+        <div className="timers-row">
+          <span style={{ color: timeLeftA < 5 ? 'red' : 'black' }}>
+            {duelMode ? "Azul: " : "Tiempo: "}{timeLeftA}s
+          </span>
+          {duelMode && (
+            <span style={{ color: timeLeftB < 5 ? 'red' : 'black' }}>
+              Rojo: {timeLeftB}s
+            </span>
+          )}
+        </div>
+      )}
+
+      {duelMode ? (
+        <div className="duel-questions">
+          <div className="duel-question duel-question-a">
+            <small>Equipo A · {gradeLevelA}</small>
+            <QuestionDisplay question={questionA} />
+          </div>
+          <div className="duel-question duel-question-b">
+            <small>Equipo B · {gradeLevelB}</small>
+            <QuestionDisplay question={questionB} />
+          </div>
+        </div>
+      ) : (
+        <QuestionDisplay question={questionA} />
+      )}
 
       <ScoreBar progress={progress} />
 
@@ -179,7 +244,14 @@ export const GameScreen = ({gradeLevel, handleWinner, useTimer, time, handleExit
       <p className='message-text'>{message}</p>
 
       <div className='skip-button'>
-        <button onClick={handleSkip}>Saltar pregunta</button>
+        {duelMode ? (
+          <>
+            <button className='btn-skip' onClick={() => handleSkip("A")}>Saltar (Azul)</button>
+            <button className='btn-skip'  onClick={() => handleSkip("B")}>Saltar (Rojo)</button>
+          </>
+        ) : (
+          <button onClick={() => handleSkip("A")}>Saltar pregunta</button>
+        )}
       </div>
 
     </div>

@@ -1,8 +1,24 @@
 import type { GradeLevel } from "../types/game";
 
+const GRADES: { value: GradeLevel; label: string }[] = [
+    { value: "1-basic", label: "1° Básico" },
+    { value: "2-basic", label: "2° Básico" },
+    { value: "3-basic", label: "3° Básico" },
+    { value: "4-basic", label: "4° Básico" },
+    { value: "5-basic", label: "5° Básico" },
+    { value: "6-basic", label: "6° Básico" },
+    { value: "7-basic", label: "7° Básico" },
+    { value: "8-basic", label: "8° Básico" },
+];
+
 interface Props {
     gradeLevel: GradeLevel;
     onGradeLevelChange: (grade: GradeLevel) => void;
+
+    gradeLevelB: GradeLevel;
+    onGradeLevelBChange: (grade: GradeLevel) => void;
+    duelMode: boolean;
+    onDuelModeChange: (value: boolean) => void;
 
     useTimer: boolean;
     onTimerChange: (value: boolean) => void;
@@ -19,6 +35,10 @@ interface Props {
 export default function StartScreen({
     gradeLevel,
     onGradeLevelChange,
+    gradeLevelB,
+    onGradeLevelBChange,
+    duelMode,
+    onDuelModeChange,
     useTimer,
     onTimerChange,
     onStart,
@@ -28,26 +48,60 @@ export default function StartScreen({
     useWebControllers,
     setWebControllers,
 }: Props ) {
+
+    // Mantiene el tiempo siempre entre 5 y 60 (y evita NaN si el campo queda vacío)
+    const handleTimeChange = (raw: string) => {
+        const parsed = parseInt(raw);
+        if (isNaN(parsed)) {
+            onTimeChange(5);
+            return;
+        }
+        onTimeChange(Math.min(60, Math.max(5, parsed)));
+    };
+
     return (
         <div className="screen-card">
             <h1>Matemáticas</h1>
             <p>Selecciona el curso para comenzar</p>
 
+            <div>
+                <div className="checkbox-wrapper-2">
+                    <input
+                        type="checkbox"
+                        id="duel-toggle"
+                        checked={duelMode}
+                        className="sc-gJwTLC ikxBAC"
+                        onChange={(e) => onDuelModeChange(e.target.checked)}
+                    />
+                </div>
+                <label htmlFor="duel-toggle">¿Modo duelo? (cada equipo con su curso)</label>
+            </div>
+
+            <label htmlFor="grade-a">{duelMode ? "Equipo A (azul):" : "Curso:"}</label>
             <select
+                id="grade-a"
                 value={gradeLevel}
-                onChange={(e) =>
-                onGradeLevelChange(e.target.value as GradeLevel)
-                }
+                onChange={(e) => onGradeLevelChange(e.target.value as GradeLevel)}
             >
-                <option value="1-basic">1° Básico</option>
-                <option value="2-basic">2° Básico</option>
-                <option value="3-basic">3° Básico</option>
-                <option value="4-basic">4° Básico</option>
-                <option value="5-basic">5° Básico</option>
-                <option value="6-basic">6° Básico</option>
-                <option value="7-basic">7° Básico</option>
-                <option value="8-basic">8° Básico</option>
+                {GRADES.map((g) => (
+                    <option key={g.value} value={g.value}>{g.label}</option>
+                ))}
             </select>
+
+            {duelMode && (
+                <>
+                    <label htmlFor="grade-b">Equipo B (rojo):</label>
+                    <select
+                        id="grade-b"
+                        value={gradeLevelB}
+                        onChange={(e) => onGradeLevelBChange(e.target.value as GradeLevel)}
+                    >
+                        {GRADES.map((g) => (
+                            <option key={g.value} value={g.value}>{g.label}</option>
+                        ))}
+                    </select>
+                </>
+            )}
 
             <div>
                 <div className="checkbox-wrapper-2">
@@ -61,14 +115,22 @@ export default function StartScreen({
                 max="60"
                 id="time-duration"
                 placeholder="5"
-                onChange={ (e) => onTimeChange( parseInt(e.target.value) < 5 ? 5 : parseInt(e.target.value) ) }
+                onChange={ (e) => handleTimeChange(e.target.value) }
                 disabled={!useTimer}
             />
+
             <div>
                 <div className="checkbox-wrapper-2">
-                    <input type="checkbox" id="shift-toggle" checked={shift} className="sc-gJwTLC ikxBAC" onChange={ (e) => onShiftChange(e.target.checked) }/>
+                    <input
+                        type="checkbox"
+                        id="shift-toggle"
+                        checked={shift && !duelMode}
+                        disabled={duelMode}
+                        className="sc-gJwTLC ikxBAC"
+                        onChange={ (e) => onShiftChange(e.target.checked) }
+                    />
                 </div>
-                <label htmlFor="shift-toggle">¿Por turnos?</label>
+                <label htmlFor="shift-toggle">¿Por turnos? {duelMode && "(no disponible en duelo)"}</label>
             </div>
 
             <div>
