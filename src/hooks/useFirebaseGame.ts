@@ -4,8 +4,10 @@ import { database } from '../services/firebaseConfig';
 import type { Team } from '../types/game';
 
 export function useFirebaseGame(
-        isActive: boolean, 
-        onAnswerReceived: (team: Team, value: number) => void
+        isActive: boolean,
+        // Debe devolver true/false según la respuesta fue correcta o no,
+        // o undefined si la respuesta se ignoró (por ejemplo, partida terminada).
+        onAnswerReceived: (team: Team, value: number) => boolean | undefined
     ) {
 
     const [roomCode] = useState<string | null>(() => {
@@ -37,13 +39,24 @@ export function useFirebaseGame(
         const unsubscribe = onValue(answerRef, (snapshot) => {
             const data = snapshot.val();
             if (data && data.team && data.value !== undefined) {
-                onAnswerReceivedRef.current(data.team, data.value);
+                const correct = onAnswerReceivedRef.current(data.team, data.value);
+
+                // Le avisamos a la tablet si su respuesta fue correcta o no.
+                // answerTimestamp es el mismo valor que envió la tablet, así sabe
+                // que este resultado corresponde a SU respuesta.
+                if (correct !== undefined) {
+                    set(ref(database, `rooms/${roomCode}/lastResult`), {
+                        team: data.team,
+                        correct,
+                        answerTimestamp: data.timestamp ?? 0
+                    });
+                }
             }
         });
 
         return () => {
-            unsubscribe(); 
-            remove(roomRef); 
+            unsubscribe();
+            remove(roomRef);
         };
     }, [isActive, roomCode]);
 

@@ -131,14 +131,15 @@ export const GameScreen = ({
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [timeLeftB]);
 
-  const handleAnswer = (team: Team, value: number) => {
-    if (gameOver) return;
+  // Devuelve true/false si la respuesta fue correcta o no, o undefined si se ignoró
+  const handleAnswer = (team: Team, value: number): boolean | undefined => {
+    if (gameOver) return undefined;
 
     const question = team === "A" ? questionA : questionB;
 
     if (value !== question.answer) {
       setMessage(`¡Equipo ${team}: respuesta incorrecta!`);
-      return;
+      return false;
     }
 
     const newProgress = team === "A" ? progress + 10 : progress - 10;
@@ -164,7 +165,7 @@ export const GameScreen = ({
       setTimeout(() => {
         handleWinner("B");
       }, 5000);
-      return;
+      return true;
     }
 
     // GANA EQUIPO A (Azul)
@@ -180,10 +181,11 @@ export const GameScreen = ({
       setTimeout(() => {
         handleWinner("A");
       }, 5000);
-      return;
+      return true;
     }
 
     refreshQuestion(team);
+    return true;
   };
 
   const { roomCode, setGameFinished } = useFirebaseGame(useWebControllers, handleAnswer);
@@ -246,8 +248,8 @@ export const GameScreen = ({
       <div className='skip-button'>
         {duelMode ? (
           <>
-            <button className='btn-skip' onClick={() => handleSkip("A")}>Saltar (Azul)</button>
-            <button className='btn-skip'  onClick={() => handleSkip("B")}>Saltar (Rojo)</button>
+            <button onClick={() => handleSkip("A")}>Saltar (Azul)</button>
+            <button onClick={() => handleSkip("B")}>Saltar (Rojo)</button>
           </>
         ) : (
           <button onClick={() => handleSkip("A")}>Saltar pregunta</button>
