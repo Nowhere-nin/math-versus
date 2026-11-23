@@ -46,6 +46,7 @@ function App() {
           setWinner(null);
           setScreen("game");
         }}
+        time={time}
         onTimeChange={setTime}
         shift={shift}
         onShiftChange={setShift}

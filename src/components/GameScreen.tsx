@@ -15,6 +15,8 @@ import { useFirebaseGame } from "../hooks/useFirebaseGame";
 
 import "../Duel.css";
 
+const gradeLabel = (g: GradeLevel) => `${g.split("-")[0]}° Básico`;
+
 interface Props {
     gradeLevelA: GradeLevel;
     gradeLevelB: GradeLevel;
@@ -196,50 +198,55 @@ export const GameScreen = ({
 
   return (
     <div className='app-container'>
-      <div className='exit-button'>
-        <button onClick={handleExit}>Salir</button>
-      </div>
-
-      {useWebControllers && roomCode && (
-        <div className="room-code-display" style={{ textAlign: "center", marginBottom: "20px" }}>
-          <h2>Código de la sala: {roomCode}</h2>
-          <p>Ingresa este código en tu dispositivo para jugar</p>
+      <div className='top-bar'>
+        <div className='exit-button'>
+          <button onClick={handleExit}>Salir</button>
         </div>
-      )}
 
-      { useTimer && (
-        <div className="timers-row">
-          <span style={{ color: timeLeftA < 5 ? 'red' : 'black' }}>
-            {duelMode ? "Azul: " : "Tiempo: "}{timeLeftA}s
-          </span>
-          {duelMode && (
-            <span style={{ color: timeLeftB < 5 ? 'red' : 'black' }}>
-              Rojo: {timeLeftB}s
-            </span>
+        <div>
+          {useWebControllers && roomCode && (
+            <div className="room-code-display">
+              <span className="room-code-label">Código de la sala</span>
+              <strong className="room-code-value">{roomCode}</strong>
+              <span className="room-code-hint">Ingrésalo en tu dispositivo para jugar</span>
+            </div>
           )}
         </div>
-      )}
+
+        <div />
+      </div>
 
       {duelMode ? (
         <div className="duel-questions">
           <div className="duel-question duel-question-a">
-            <small>Equipo A · {gradeLevelA}</small>
+            <small>Equipo A · {gradeLabel(gradeLevelA)}</small>
             <QuestionDisplay question={questionA} />
+            {useTimer && (
+              <div className={`timer ${timeLeftA <= 3 ? "timer-low" : ""}`}>{timeLeftA} s</div>
+            )}
           </div>
           <div className="duel-question duel-question-b">
-            <small>Equipo B · {gradeLevelB}</small>
+            <small>Equipo B · {gradeLabel(gradeLevelB)}</small>
             <QuestionDisplay question={questionB} />
+            {useTimer && (
+              <div className={`timer ${timeLeftB <= 3 ? "timer-low" : ""}`}>{timeLeftB} s</div>
+            )}
           </div>
         </div>
       ) : (
-        <QuestionDisplay question={questionA} />
+        <>
+          <QuestionDisplay question={questionA} />
+          {useTimer && (
+            <div className={`timer ${timeLeftA <= 3 ? "timer-low" : ""}`}>Tiempo: {timeLeftA} s</div>
+          )}
+        </>
       )}
 
       <ScoreBar progress={progress} />
 
       <div className='calculators-container'>
         { !useWebControllers ? <Calculator team='A' onSubmit={handleAnswer} disabled={!blueShift}/> : "" }
-        { View }
+        <div className="lottie-wrapper">{ View }</div>
         { !useWebControllers ? <Calculator team='B' onSubmit={handleAnswer} disabled={!redShift}/> : "" }
       </div>
 
@@ -248,8 +255,8 @@ export const GameScreen = ({
       <div className='skip-button'>
         {duelMode ? (
           <>
-            <button onClick={() => handleSkip("A")}>Saltar (Azul)</button>
-            <button onClick={() => handleSkip("B")}>Saltar (Rojo)</button>
+            <button className="btn-skip-a" onClick={() => handleSkip("A")}>Saltar (Azul)</button>
+            <button className="btn-skip-b" onClick={() => handleSkip("B")}>Saltar (Rojo)</button>
           </>
         ) : (
           <button onClick={() => handleSkip("A")}>Saltar pregunta</button>

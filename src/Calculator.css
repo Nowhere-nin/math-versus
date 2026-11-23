@@ -64,3 +64,16 @@
   background-color: #10b981 !important;
   color: white;
 }
+/* Título de cada calculadora con el color de su equipo */
+.calculator-team-a .calculator-title {
+  color: #1d4ed8;
+}
+
+.calculator-team-b .calculator-title {
+  color: #b91c1c;
+}
+
+.calculator-buttons button {
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}

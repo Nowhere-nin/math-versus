@@ -24,6 +24,7 @@ interface Props {
     onTimerChange: (value: boolean) => void;
 
     onStart: () => void;
+    time: number;
     onTimeChange: (value: number) => void;
     shift: boolean;
     onShiftChange: (value:boolean) => void;
@@ -42,6 +43,7 @@ export default function StartScreen({
     useTimer,
     onTimerChange,
     onStart,
+    time,
     onTimeChange,
     shift,
     onShiftChange,
@@ -60,87 +62,132 @@ export default function StartScreen({
     };
 
     return (
-        <div className="screen-card">
+        <div className="screen-card start-card">
             <h1>Matemáticas</h1>
-            <p>Selecciona el curso para comenzar</p>
+            <p>Configura la partida</p>
 
-            <div>
-                <div className="checkbox-wrapper-2">
-                    <input
-                        type="checkbox"
-                        id="duel-toggle"
-                        checked={duelMode}
-                        className="sc-gJwTLC ikxBAC"
-                        onChange={(e) => onDuelModeChange(e.target.checked)}
-                    />
+            <div className="setting-group">
+
+                {/* Modo duelo */}
+                <div className="setting-row">
+                    <div className="checkbox-wrapper-2">
+                        <input
+                            type="checkbox"
+                            id="duel-toggle"
+                            checked={duelMode}
+                            className="sc-gJwTLC ikxBAC"
+                            onChange={(e) => onDuelModeChange(e.target.checked)}
+                        />
+                    </div>
+                    <div className="setting-text">
+                        <label htmlFor="duel-toggle">Modo duelo</label>
+                        <small className="hint">Cada equipo responde preguntas de su propio curso</small>
+                    </div>
                 </div>
-                <label htmlFor="duel-toggle">¿Modo duelo? (cada equipo con su curso)</label>
+
+                {/* Cursos */}
+                <div className="grade-row">
+                    <div className={duelMode ? "grade-field grade-field-a" : "grade-field"}>
+                        <label htmlFor="grade-a">{duelMode ? "Equipo A (azul)" : "Curso"}</label>
+                        <select
+                            id="grade-a"
+                            value={gradeLevel}
+                            onChange={(e) => onGradeLevelChange(e.target.value as GradeLevel)}
+                        >
+                            {GRADES.map((g) => (
+                                <option key={g.value} value={g.value}>{g.label}</option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {duelMode && (
+                        <div className="grade-field grade-field-b">
+                            <label htmlFor="grade-b">Equipo B (rojo)</label>
+                            <select
+                                id="grade-b"
+                                value={gradeLevelB}
+                                onChange={(e) => onGradeLevelBChange(e.target.value as GradeLevel)}
+                            >
+                                {GRADES.map((g) => (
+                                    <option key={g.value} value={g.value}>{g.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+                </div>
+
+                {/* Tiempo limitado */}
+                <div className="setting-row">
+                    <div className="checkbox-wrapper-2">
+                        <input
+                            type="checkbox"
+                            id="timer-toggle"
+                            checked={useTimer}
+                            className="sc-gJwTLC ikxBAC"
+                            onChange={(e) => onTimerChange(e.target.checked)}
+                        />
+                    </div>
+                    <div className="setting-text">
+                        <label htmlFor="timer-toggle">Tiempo limitado</label>
+                        <small className="hint">Si se acaba el tiempo, se salta la pregunta</small>
+                    </div>
+                </div>
+
+                {useTimer && (
+                    <div className="setting-row setting-sub">
+                        <label htmlFor="time-duration">Segundos por pregunta (5 a 60):</label>
+                        <input
+                            className="time-input"
+                            type="number"
+                            min="5"
+                            max="60"
+                            id="time-duration"
+                            placeholder="5"
+                            defaultValue={time}
+                            onChange={(e) => handleTimeChange(e.target.value)}
+                        />
+                    </div>
+                )}
+
+                {/* Por turnos */}
+                <div className="setting-row">
+                    <div className="checkbox-wrapper-2">
+                        <input
+                            type="checkbox"
+                            id="shift-toggle"
+                            checked={shift && !duelMode}
+                            disabled={duelMode}
+                            className="sc-gJwTLC ikxBAC"
+                            onChange={(e) => onShiftChange(e.target.checked)}
+                        />
+                    </div>
+                    <div className="setting-text">
+                        <label htmlFor="shift-toggle">Por turnos</label>
+                        <small className="hint">
+                            {duelMode ? "No disponible en modo duelo" : "Los equipos se alternan para responder"}
+                        </small>
+                    </div>
+                </div>
+
+                {/* Dispositivos externos */}
+                <div className="setting-row">
+                    <div className="checkbox-wrapper-2">
+                        <input
+                            type="checkbox"
+                            id="web-toggle"
+                            checked={useWebControllers}
+                            className="sc-gJwTLC ikxBAC"
+                            onChange={(e) => setWebControllers(e.target.checked)}
+                        />
+                    </div>
+                    <div className="setting-text">
+                        <label htmlFor="web-toggle">Usar dispositivos externos</label>
+                        <small className="hint">Los jugadores responden desde tablets o celulares</small>
+                    </div>
+                </div>
             </div>
 
-            <label htmlFor="grade-a">{duelMode ? "Equipo A (azul):" : "Curso:"}</label>
-            <select
-                id="grade-a"
-                value={gradeLevel}
-                onChange={(e) => onGradeLevelChange(e.target.value as GradeLevel)}
-            >
-                {GRADES.map((g) => (
-                    <option key={g.value} value={g.value}>{g.label}</option>
-                ))}
-            </select>
-
-            {duelMode && (
-                <>
-                    <label htmlFor="grade-b">Equipo B (rojo):</label>
-                    <select
-                        id="grade-b"
-                        value={gradeLevelB}
-                        onChange={(e) => onGradeLevelBChange(e.target.value as GradeLevel)}
-                    >
-                        {GRADES.map((g) => (
-                            <option key={g.value} value={g.value}>{g.label}</option>
-                        ))}
-                    </select>
-                </>
-            )}
-
-            <div>
-                <div className="checkbox-wrapper-2">
-                    <input type="checkbox" id="timer-toggle" checked={useTimer} className="sc-gJwTLC ikxBAC" onChange={ (e) => onTimerChange(e.target.checked) }/>
-                </div>
-                <label htmlFor="timer-toggle">¿Activar tiempo limitado? (mínimo 5s - máximo 60s)</label>
-            </div>
-            <input
-                type="number"
-                min="5"
-                max="60"
-                id="time-duration"
-                placeholder="5"
-                onChange={ (e) => handleTimeChange(e.target.value) }
-                disabled={!useTimer}
-            />
-
-            <div>
-                <div className="checkbox-wrapper-2">
-                    <input
-                        type="checkbox"
-                        id="shift-toggle"
-                        checked={shift && !duelMode}
-                        disabled={duelMode}
-                        className="sc-gJwTLC ikxBAC"
-                        onChange={ (e) => onShiftChange(e.target.checked) }
-                    />
-                </div>
-                <label htmlFor="shift-toggle">¿Por turnos? {duelMode && "(no disponible en duelo)"}</label>
-            </div>
-
-            <div>
-                <div className="checkbox-wrapper-2">
-                    <input type="checkbox" id="web-toggle" checked={useWebControllers} className="sc-gJwTLC ikxBAC" onChange={ (e) => setWebControllers(e.target.checked) }/>
-                </div>
-                <label htmlFor="web-toggle">¿Usar dispositivos externos?</label>
-            </div>
-
-            <button onClick={onStart}>Comenzar partida</button>
+            <button className="start-btn" onClick={onStart}>Comenzar partida</button>
         </div>
     )
 }

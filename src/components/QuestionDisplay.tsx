@@ -6,7 +6,7 @@ interface Props {
 
 export default function QuestionDisplay( { question }: Props ) {
     return (
-        <h2>
+        <h2 className="question-text">
             { question.num1 } { question.operator === "*" ? "•" : question.operator } { question.num2 }
         </h2>
     )
